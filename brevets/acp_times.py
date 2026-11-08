@@ -15,7 +15,41 @@ import arrow
 #  javadoc comments.
 #
 
+SPEED_TABLE = [
+    (0, 200, 15, 34),
+    (200, 400, 15, 32),
+    (400, 600, 15, 30),
+    (600, 1000, 11.428, 28),
+]
+def _clean_distance(control_dist_km, brevet_dist_km):
+    if control_dist_km < 0:
+        raise ValueError("Control distance can't be negative")
+    if control_dist_km > brevet_dist_km * 1.2:
+        raise ValueError("Control is more than 20% pass the brevet distance")
+    if control_dist_km > brevet_dist_km:
+        return brevet_dist_km
+    return control_dist_km
 
+def _hours_for_distance(dist_km, use_max_speed):
+    hours = 0
+    for start, end, min_speed, max_speed in SPEED_TABLE:
+        km_in_band = min(dist_km, end) - start
+        if km_in_band <= 0:
+            break
+        if use_max_speed:
+            speed = max_speed
+        else:
+            speed = min_speed
+        hours += km_in_band / speed
+    return hours
+
+def _shift_time(brevet_start_time, hours):
+    minutes = round(hours * 60)
+    start = arrow.get(brevet_start_time)
+    return start.shift(minutes=minutes).isoformat()
+
+
+        
 def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
     """
     Args:
@@ -29,6 +63,7 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
        An ISO 8601 format date string indicating the control open time.
        This will be in the same time zone as the brevet start time.
     """
+
     return arrow.now().isoformat()
 
 
