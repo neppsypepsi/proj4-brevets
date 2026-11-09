@@ -26,6 +26,8 @@ FINISH_CLOSE_HOURS = {
     }
 
 def _clean_distance(control_dist_km, brevet_dist_km):
+    if brevet_dist_km not in FINISH_CLOSE_HOURS:
+        raise ValueError("Brevet distance must be 200, 300, 400, 600, or 1000 km")
     if control_dist_km < 0:
         raise ValueError("Control distance can't be negative")
     if control_dist_km > brevet_dist_km * 1.2:

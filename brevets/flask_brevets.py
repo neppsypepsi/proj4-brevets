@@ -11,6 +11,7 @@ import acp_times  # Brevet time calculations
 import config
 
 import logging
+import math
 
 ###
 # Globals
@@ -59,11 +60,15 @@ def _calc_times():
     app.logger.debug("km={} brevet={} start={} {}".format(
         km, brevet_dist_km, begin_date, begin_time))
 
-    if km is None:
+    if km is None or math.isnan(km):
         return flask.jsonify(error="Enter a number for the control distance"), 400
 
     try:
         start = arrow.get(begin_date + "T" + begin_time).isoformat()
+    except ValueError:
+        return flask.jsonify(error="Enter a valid start date and time"), 400
+
+    try:
         open_time = acp_times.open_time(km, brevet_dist_km, start)
         close_time = acp_times.close_time(km, brevet_dist_km, start)
     except ValueError as e:

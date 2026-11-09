@@ -35,3 +35,6 @@ def test_open_at_start():
 
 def test_too_far_past_finish_is_rejected():
     assert_raises(ValueError, acp_times.open_time, 300, 200, START)
+
+def test_unofficial_brevet_distance_is_rejected():
+    assert_raises(ValueError, acp_times.close_time, 250, 250, START)
